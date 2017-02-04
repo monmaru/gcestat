@@ -1,0 +1,83 @@
+{
+    "memo": "f064f5a18b176eddf429452ff56758df4f98c5e3eb974da62fc1f12f11eddc25",
+    "projects": [
+        {
+            "name": "cloud.google.com/go",
+            "version": "v0.6.0",
+            "revision": "c116c7972ec94f148459a304d07a67ecbc770d4b",
+            "packages": [
+                "compute/metadata"
+            ]
+        },
+        {
+            "name": "github.com/BurntSushi/toml",
+            "branch": "master",
+            "revision": "99064174e013895bbd9b025c31100bd1d9b590ca",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/golang/protobuf",
+            "branch": "master",
+            "revision": "8ee79997227bf9b34611aee7946ae64735e6fd93",
+            "packages": [
+                "proto"
+            ]
+        },
+        {
+            "name": "github.com/googleapis/gax-go",
+            "branch": "master",
+            "revision": "da06d194a00e19ce00d9011a13931c3f6f6887c7",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "golang.org/x/net",
+            "branch": "master",
+            "revision": "41bba8d80bbfab43231ffdf4c210037baae5f6a3",
+            "packages": [
+                "context",
+                "context/ctxhttp",
+                "http2",
+                "http2/hpack",
+                "trace"
+            ]
+        },
+        {
+            "name": "golang.org/x/oauth2",
+            "branch": "master",
+            "revision": "314dd2c0bf3ebd592ec0d20847d27e79d0dbe8dd",
+            "packages": [
+                "google"
+            ]
+        },
+        {
+            "name": "google.golang.org/api",
+            "branch": "master",
+            "revision": "c55f685368bb1cdfed2c20283e2878a83b929730",
+            "packages": [
+                "compute/v1"
+            ]
+        },
+        {
+            "name": "google.golang.org/appengine",
+            "version": "v1.0.0",
+            "revision": "150dc57a1b433e64154302bdc40b6bb8aefa313a",
+            "packages": [
+                ".",
+                "urlfetch"
+            ]
+        },
+        {
+            "name": "google.golang.org/grpc",
+            "version": "v1.0.5",
+            "revision": "708a7f9f3283aa2d4f6132d287d78683babe55c8",
+            "packages": [
+                ".",
+                "codes"
+            ]
+        }
+    ]
+}
