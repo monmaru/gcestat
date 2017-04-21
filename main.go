@@ -2,72 +2,67 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"os"
+	"log"
 
-	"github.com/BurntSushi/toml"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
+	crm "google.golang.org/api/cloudresourcemanager/v1"
 	compute "google.golang.org/api/compute/v1"
 )
 
-type config struct {
-	GCP gcpConfig
-}
-
-type gcpConfig struct {
-	ProjectID string
-	Zone      string
-}
-
-func getInstanceList(client *http.Client, config gcpConfig) (*compute.InstanceList, error) {
-	service, err := compute.New(client)
-	if err != nil {
-		return nil, err
-	}
-
-	s := compute.NewInstancesService(service)
-	list, err := s.List(config.ProjectID, config.Zone).Do()
-	if err != nil {
-		return nil, err
-	}
-	return list, err
-}
-
-func showInstanceInfo(client *http.Client, config gcpConfig) {
-	list, err := getInstanceList(client, config)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return
-	}
-
-	for _, item := range list.Items {
-		fmt.Println("Name: ", item.Name)
-		fmt.Println("Id: ", item.Id)
-		fmt.Println("Zone: ", item.Zone)
-		fmt.Println("Tags: ", item.Tags)
-		fmt.Println("Kind: ", item.Kind)
-		fmt.Println("MachineType: ", item.MachineType)
-		fmt.Println("StatusMessage: ", item.StatusMessage)
-		fmt.Println("Description: ", item.Description)
-		fmt.Println("-------------------------------")
-	}
-}
-
 func main() {
-	var config config
-	_, err := toml.DecodeFile("config.toml", &config)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return
-	}
-
 	ctx := context.Background()
-	client, err := google.DefaultClient(ctx)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return
-	}
+	client, err := google.DefaultClient(ctx, compute.ComputeScope)
+	exitIfError(err)
 
-	showInstanceInfo(client, config.GCP)
+	resourceManager, err := crm.New(client)
+	exitIfError(err)
+
+	projectsResponse, err := resourceManager.Projects.List().Do()
+	exitIfError(err)
+
+	compute, err := compute.New(client)
+	exitIfError(err)
+
+	for _, project := range projectsResponse.Projects {
+		fmt.Printf("[%s]\n", project.ProjectId)
+		zonesResponse, err := compute.Zones.List(project.ProjectId).Do()
+		if err != nil {
+			fmt.Println("Could not access this project.")
+			continue
+		}
+
+		for _, zone := range zonesResponse.Items {
+			instancesResponse, err := compute.Instances.List(project.ProjectId, zone.Name).Do()
+			if err != nil {
+				fmt.Println("Could not get instance information.")
+				continue
+			}
+
+			if len(instancesResponse.Items) == 0 {
+				continue
+			}
+
+			showInstances(instancesResponse.Items)
+		}
+	}
+}
+
+func showInstances(instances []*compute.Instance) {
+	for _, instance := range instances {
+		fmt.Println("-------------------------------")
+		fmt.Println("Name        :", instance.Name)
+		fmt.Println("Id          :", instance.Id)
+		fmt.Println("Zone        :", instance.Zone)
+		fmt.Println("Tags        :", instance.Tags)
+		fmt.Println("MachineType :", instance.MachineType)
+		fmt.Println("Status      :", instance.Status)
+		fmt.Println("Description :", instance.Description)
+	}
+}
+
+func exitIfError(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }
